@@ -70,9 +70,6 @@ def on_modified(event):
         trello_db = check_for_additional_info(trello_db, watch_dir, deepseq_trello_db)
         trello_db = check_for_bioinformatics_info(trello_db, watch_dir, deepseq_trello_db)
     else:
-        # add to a pre-existing one
-        ### TODO not sure this is trelo_db or deepseq_trello_db
-        #### if there is trouble, check here first
         trello_db = check_for_new_proj_subdir(deepseq_trello_db, watch_dir)
         # has a quote been added?
         trello_db = check_for_quote(trello_db, watch_dir, deepseq_trello_db)

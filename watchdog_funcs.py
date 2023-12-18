@@ -20,7 +20,6 @@ def parse_quote(quote_docx, \
                 quote_file,
                 watch_dir,
                 deepseq_trello_db):
-    print("in the quote function")
     try:
         doc = zipfile.ZipFile(quote_docx).read('word/document.xml')
         root = ET.fromstring(doc)
@@ -29,18 +28,33 @@ def parse_quote(quote_docx, \
         # find XML body tag
         body = root.find('w:body', ns)
         # find paragraphs in body
-        p_sections = body.findall('w:p', ns)
+        t_sections = body.findall('w:tbl', ns)
         ### this will go through the document line by line
+        for t in t_sections:
+            table_elems = t.findall('.//w:t', ns)
+            line = ''.join([k.text for k in table_elems])
+            if "Total Cost" in line:
+                print(line)
+                try:
+                    cost = line.strip().split("Total Cost" )[1]
+                    cost = cost.strip()
+                    print(cost)
+                    trello_db[project]["project_cost"] = str(cost)
+                except:
+                    pass
+        p_sections = body.findall('w:p', ns)
         for p in p_sections:
             text_elems = p.findall('.//w:t', ns)
             line = ''.join([t.text for t in text_elems])
             if "PREPARED BY:" in line:
+                print(line)
                 try:
                     prepared_by = line.strip().split("PREPARED BY: ")[1]
                     trello_db[project]["quote_prepared_by"] = str(prepared_by)
                 except:
                     pass
             if "REF:" in line:
+                print(line)
                 try:
                     quote_ref = line.strip().split("REF: ")[1]
                     trello_db[project]["quote_ref_full_name"] = str(quote_ref)
@@ -309,7 +323,6 @@ def does_pickle_db_exist(deepseq_trello_db):
     return(exists)
 
 def setup_new_trello_db(watch_dir, deepseq_trello_db):
-    print("new trello DB")
     trello_db = {}
     for directory in os.listdir(watch_dir):
         trello_db = {
